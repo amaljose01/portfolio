@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amal Jose — Cloud Operations & Automation Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0f1a;
+      --bg-card: #111827;
+      --bg-card2: #1a2235;
+      --accent: #00e5a0;
+      --accent2: #3b82f6;
+      --text: #f0f4ff;
+      --muted: #8892a4;
+      --border: rgba(255,255,255,0.08);
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 3rem;
+      background: rgba(11, 15, 26, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* HERO */
+    #home {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 7rem 3rem 4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      gap: 4rem;
+    }
+
+    .hero-text { flex: 1; }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-name span { color: var(--accent); }
+
+    .hero-role {
+      font-size: 1.15rem;
+      color: var(--muted);
+      margin-bottom: 1.8rem;
+      font-weight: 400;
+    }
+
+    .hero-role strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #0b0f1a;
+      padding: 0.75rem 1.6rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.85; }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.75rem 1.6rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-outline:hover { border-color: var(--accent); background: rgba(0,229,160,0.05); }
+
+    /* HERO IMAGE */
+    .hero-image {
+      flex-shrink: 0;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 40px rgba(0,229,160,0.18);
+      position: relative;
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-image-placeholder {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-card2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .hero-image-placeholder .initials {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .hero-image-placeholder .add-photo-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    /* TECH STACK TICKER */
+    .stack-ticker {
+      padding: 1.2rem 3rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ticker-inner {
+      display: flex;
+      gap: 3rem;
+      animation: ticker 30s linear infinite;
+      width: max-content;
+    }
+
+    .ticker-item {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ticker-dot { color: var(--accent); font-size: 18px; line-height: 1; }
+
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* SECTIONS */
+    section { padding: 5rem 3rem; max-width: 1100px; margin: 0 auto; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 3rem;
+    }
+
+    /* ABOUT */
+    #about .about-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-text p {
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+      font-size: 1rem;
+    }
+
+    .about-text p strong { color: var(--text); }
+
+    .about-stats {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    /* SKILLS */
+    #skills .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .skill-category {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+
+    .skill-cat-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .skill-tag {
+      background: rgba(0,229,160,0.08);
+      color: rgba(0,229,160,0.9);
+      border: 1px solid rgba(0,229,160,0.2);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+
+    /* EXPERIENCE */
+    #experience .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 2.5rem;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2.4rem;
+      top: 8px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(0,229,160,0.4);
+    }
+
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+
+    .timeline-role {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .timeline-company {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 0.75rem;
+    }
+
+    .timeline-desc {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    /* BLOG */
+    #blog .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .blog-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.75rem;
+      transition: border-color 0.2s, transform 0.2s;
+      text-decoration: none;
+      display: block;
+    }
+
+    .blog-card:hover {
+      border-color: rgba(0,229,160,0.3);
+      transform: translateY(-3px);
+    }
+
+    .blog-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .blog-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      line-height: 1.45;
+      margin-bottom: 0.75rem;
+    }
+
+    .blog-excerpt {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .blog-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      gap: 1rem;
+    }
+
+    /* CONTACT */
+    #contact {
+      text-align: center;
+    }
+
+    #contact .contact-inner {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    #contact p {
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      text-decoration: none;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .social-link:hover { color: var(--text); border-color: var(--accent); }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* DIVIDER */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.2rem; }
+      #home { flex-direction: column-reverse; padding: 6rem 1.5rem 3rem; gap: 2rem; align-items: flex-start; }
+      .hero-image { width: 160px; height: 160px; }
+      section { padding: 3.5rem 1.5rem; }
+      #about .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .stack-ticker { padding: 1rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">amal.jose ~$</span>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#blog">Blog</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="home">
+    <div class="hero-text">
+      <p class="hero-eyebrow">// Cloud Operations · Automation · Program Management</p>
+      <h1 class="hero-name">Amal<br /><span>Jose</span></h1>
+      <p class="hero-role">
+        <strong>SAP Labs India</strong> &nbsp;·&nbsp; 11+ Years in Cloud, Operations & Automation
+      </p>
+      <p class="hero-desc">
+        I build the systems, pipelines, and programmes that keep cloud platforms running at scale. From automating complex operational workflows to leading cross-functional delivery — I work at the intersection of engineering, operations, and programme management.
+      </p>
+      <div class="hero-ctas">
+        <a href="#blog" class="btn-primary">Read my blog →</a>
+        <a href="#contact" class="btn-outline">Get in touch</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <!--
+        TO ADD YOUR PHOTO:
+        Replace the .hero-image-placeholder div below with:
+        <img src="photo.jpg" alt="Amal Jose" />
+        Make sure photo.jpg is in the same folder as index.html
+      -->
+      <div class="hero-image-placeholder">
+        <span class="initials">AJ</span>
+        <span class="add-photo-label">add photo.jpg</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH TICKER -->
+  <div class="stack-ticker" aria-hidden="true">
+    <div class="ticker-inner">
+      <span class="ticker-item"><span class="ticker-dot">·</span> SAP BTP</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Kubernetes</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> ArgoCD</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Concourse CI</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Terraform</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Ansible</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Cloud Foundry</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Dynatrace</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Prometheus</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Grafana</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Splunk</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Jenkins</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> HashiCorp Vault</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> SAP Gardener</span>
+      <!-- duplicated for seamless scroll -->
+      <span class="ticker-item"><span class="ticker-dot">·</span> SAP BTP</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Kubernetes</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> ArgoCD</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Concourse CI</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Terraform</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Ansible</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Cloud Foundry</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Dynatrace</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Prometheus</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Grafana</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Splunk</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> Jenkins</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> HashiCorp Vault</span>
+      <span class="ticker-item"><span class="ticker-dot">·</span> SAP Gardener</span>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <!-- ABOUT -->
+  <section id="about">
+    <p class="section-label">// about me</p>
+    <h2 class="section-title">The engineer behind<br />the pipeline</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>
+          I'm a <strong>Cloud Operations & Automation Engineer</strong> with 11+ years of experience across cloud platforms, large-scale SaaS operations, and technical programme delivery. Currently at SAP Labs India, I work across the full breadth of cloud operations — from infrastructure automation and CI/CD to release governance and stakeholder management.
+        </p>
+        <p>
+          My background spans multiple dimensions: <strong>hands-on engineering</strong> (Python, Bash, IaC, GitOps), <strong>cloud operations</strong> (multi-cloud platform management, tenant lifecycle, capacity planning), and <strong>programme management</strong> (cross-team delivery, Agile execution, KPI tracking, executive communication).
+        </p>
+        <p>
+          I believe the best platform engineers can do two things equally well: write the automation that eliminates toil, and communicate its value clearly to the business. I try to do both.
+        </p>
+        <p>
+          Based in <strong>Bangalore, India</strong>. Open to conversations about cloud operations, automation strategy, and technical programme delivery at scale.
+        </p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-card">
+          <div class="stat-number">11+</div>
+          <div class="stat-label">Years across Cloud Ops, Automation & Delivery</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">4</div>
+          <div class="stat-label">Companies · SAP, Accenture, Wipro & more</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">Manual processes automated away</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <p class="section-label">// skills & tools</p>
+    <h2 class="section-title">Across engineering,<br/>operations & delivery</h2>
+    <div class="skills-grid">
+      <div class="skill-category">
+        <div class="skill-cat-title">Cloud Platforms</div>
+        <div class="skill-tags">
+          <span class="skill-tag">SAP BTP</span>
+          <span class="skill-tag">SAP Integration Suite</span>
+          <span class="skill-tag">Cloud Foundry</span>
+          <span class="skill-tag">SAP Neo</span>
+          <span class="skill-tag">AWS</span>
+          <span class="skill-tag">Azure</span>
+          <span class="skill-tag">GCP</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">CI/CD & Automation</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Concourse CI</span>
+          <span class="skill-tag">Jenkins</span>
+          <span class="skill-tag">GitHub Actions</span>
+          <span class="skill-tag">ArgoCD</span>
+          <span class="skill-tag">GitOps</span>
+          <span class="skill-tag">Automation Pilot</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Infrastructure as Code</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Terraform</span>
+          <span class="skill-tag">Ansible</span>
+          <span class="skill-tag">Kubernetes</span>
+          <span class="skill-tag">Docker</span>
+          <span class="skill-tag">SAP Gardener</span>
+          <span class="skill-tag">Helm</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Observability</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Dynatrace</span>
+          <span class="skill-tag">Prometheus</span>
+          <span class="skill-tag">Grafana</span>
+          <span class="skill-tag">Splunk</span>
+          <span class="skill-tag">ELK Stack</span>
+          <span class="skill-tag">Splunk ITSI</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Security & Secrets</div>
+        <div class="skill-tags">
+          <span class="skill-tag">HashiCorp Vault</span>
+          <span class="skill-tag">XSUAA</span>
+          <span class="skill-tag">Credstore CLI</span>
+          <span class="skill-tag">SAP Keystore Manager</span>
+          <span class="skill-tag">TRM</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Languages & Tools</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">Bash</span>
+          <span class="skill-tag">REST APIs</span>
+          <span class="skill-tag">PostgreSQL</span>
+          <span class="skill-tag">SAP HANA</span>
+          <span class="skill-tag">Postman</span>
+          <span class="skill-tag">Apigee</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Delivery & Governance</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Agile / Scrum</span>
+          <span class="skill-tag">Jira Service Management</span>
+          <span class="skill-tag">ServiceNow</span>
+          <span class="skill-tag">ITIL</span>
+          <span class="skill-tag">KPI Tracking</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">SAP Operations</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Tenant Lifecycle Mgmt</span>
+          <span class="skill-tag">Order Management</span>
+          <span class="skill-tag">SAP SuccessFactors</span>
+          <span class="skill-tag">Capacity Planning</span>
+          <span class="skill-tag">SAP CRM</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <p class="section-label">// experience</p>
+    <h2 class="section-title">Where I've delivered</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Apr 2023 — Present</div>
+        <div class="timeline-role">Senior Cloud Operations & Automation Engineer</div>
+        <div class="timeline-company">SAP Labs India · Bangalore</div>
+        <div class="timeline-desc">
+          Leading cloud operations and automation engineering for large-scale SaaS platform delivery. Designed end-to-end automation pipelines, GitOps infrastructure with ArgoCD, and certificate lifecycle automation. Built observability stacks across Dynatrace, Prometheus, Grafana, and Splunk. Drove programme delivery using Agile/Scrum — owning planning, execution tracking, dependency management, and stakeholder communication across cross-functional teams.
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Feb 2018 — Mar 2023</div>
+        <div class="timeline-role">Cloud Operations Engineer & Technical Programme Lead</div>
+        <div class="timeline-company">SAP Labs India · Bangalore</div>
+        <div class="timeline-desc">
+          Owned tenant lifecycle management, provisioning, order management, and operational workflows at scale. Built centralised logging infrastructure (Splunk multi-DC) and developed automation frameworks in Python and Bash that significantly reduced manual operational effort. Contributed to ITIL-driven delivery — supporting release planning, go-live readiness, compliance governance, and cross-team coordination.
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Apr 2016 — Feb 2018</div>
+        <div class="timeline-role">Cloud Operations Engineer</div>
+        <div class="timeline-company">Accenture · Bangalore</div>
+        <div class="timeline-desc">
+          Handled customer provisioning, order management, partner onboarding, and tenant operations across enterprise cloud environments. Implemented monitoring and alerting for platform reliability. Contributed to operational readiness, platform enablement, and cross-team delivery coordination.
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Jun 2014 — Apr 2016</div>
+        <div class="timeline-role">Systems & Infrastructure Engineer</div>
+        <div class="timeline-company">Wipro Infotech · Bangalore</div>
+        <div class="timeline-desc">
+          Managed Windows and Linux server fleets, administration, patching, and SLA compliance. Supported DR, backups, storage, and data centre operations. Contributed to automation and process improvement initiatives.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- BLOG -->
+  <section id="blog">
+    <p class="section-label">// writing</p>
+    <h2 class="section-title">Notes from the trenches</h2>
+    <div class="blog-grid">
+
+      <a href="blog-gitops-argocd.html" class="blog-card">
+        <div class="blog-tag">GitOps</div>
+        <div class="blog-title">GitOps in practice: structuring ArgoCD for multi-environment deployments</div>
+        <div class="blog-excerpt">ApplicationSets, sync waves, and environment promotion without the drift. Here's the repo structure and ArgoCD patterns that actually hold up at scale.</div>
+        <div class="blog-meta">
+          <span>2025</span>
+          <span>8 min read</span>
+        </div>
+      </a>
+
+      <a href="blog-observability-stack.html" class="blog-card">
+        <div class="blog-tag">Observability</div>
+        <div class="blog-title">Building a multi-layer observability stack: Prometheus, Grafana, and Splunk without the noise</div>
+        <div class="blog-excerpt">Each tool has a job. The real work is stitching them into a coherent picture — and cutting alert fatigue by 60%. Here's the architecture that worked.</div>
+        <div class="blog-meta">
+          <span>2025</span>
+          <span>9 min read</span>
+        </div>
+      </a>
+
+      <a href="blog-certificate-lifecycle-automation.html" class="blog-card">
+        <div class="blog-tag">Automation</div>
+        <div class="blog-title">Automating certificate lifecycle end-to-end: from discovery to rotation with Python and Jenkins</div>
+        <div class="blog-excerpt">Certificate expiry incidents are entirely preventable. This is the pipeline I built to automate the full cert lifecycle — rotation included, zero manual steps.</div>
+        <div class="blog-meta">
+          <span>2025</span>
+          <span>7 min read</span>
+        </div>
+      </a>
+
+      <a href="blog-cloud-ops-programme-management.html" class="blog-card">
+        <div class="blog-tag">Programme Management</div>
+        <div class="blog-title">How I run large cloud operations programmes: planning, KPIs, and keeping 10 teams aligned</div>
+        <div class="blog-excerpt">Technical delivery at scale is as much a coordination problem as an engineering one. Here's the programme management framework I've developed across 11 years of cloud ops.</div>
+        <div class="blog-meta">
+          <span>2025</span>
+          <span>7 min read</span>
+        </div>
+      </a>
+
+      <a href="blog-splunk-logging-architecture.html" class="blog-card">
+        <div class="blog-tag">Logging</div>
+        <div class="blog-title">Centralised logging architecture: building a production-grade Splunk setup across multiple data centres</div>
+        <div class="blog-excerpt">From SSH-and-grep to a centralised, searchable, compliance-ready logging platform. The architecture decisions that scaled from 50GB/day to 500GB/day.</div>
+        <div class="blog-meta">
+          <span>2024</span>
+          <span>11 min read</span>
+        </div>
+      </a>
+
+      <a href="blog-automation-mindset.html" class="blog-card">
+        <div class="blog-tag">Automation</div>
+        <div class="blog-title">The automation engineer's mindset: how to identify, prioritise, and build automation that sticks</div>
+        <div class="blog-excerpt">Not every manual process deserves a script. Here's the framework I use to decide what to automate, how to scope it, and how to make sure it doesn't rot.</div>
+        <div class="blog-meta">
+          <span>2024</span>
+          <span>6 min read</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-inner">
+      <p class="section-label">// contact</p>
+      <h2 class="section-title">Let's build something reliable</h2>
+      <p>Whether it's a collaboration, a speaking invite, or a conversation about cloud operations and automation strategy — my inbox is open.</p>
+      <a href="mailto:amaljom@gmail.com" class="btn-primary">Send an email →</a>
+      <div class="social-links">
+        <a href="https://linkedin.com/in/amal-jose-7a597599" class="social-link" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/amaljose" class="social-link" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://twitter.com/amaljose" class="social-link" target="_blank" rel="noopener">Twitter / X</a>
+        <a href="https://medium.com/@amaljose" class="social-link" target="_blank" rel="noopener">Medium</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 Amal Jose &nbsp;·&nbsp; Built with intention, deployed with GitHub Pages</p>
+  </footer>
+
+</body>
+</html>
