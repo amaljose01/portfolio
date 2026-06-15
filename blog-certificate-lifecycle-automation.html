@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automating Certificate Lifecycle End-to-End — Amal Jose</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#f0f2f5; --bg-card:#ffffff; --accent:#0f766e; --accent2:#2563eb; --text:#111827; --muted:#4b5563; --border:rgba(0,0,0,0.1); --font-display:'Syne',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace; }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:16px; line-height:1.7; overflow-x:hidden; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 3rem; background:rgba(240,242,245,0.92); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:var(--font-mono); font-size:15px; color:var(--accent); text-decoration:none; letter-spacing:0.05em; }
+    .nav-back { color:var(--muted); text-decoration:none; font-size:14px; font-weight:500; transition:color 0.2s; }
+    .nav-back:hover { color:var(--text); }
+    .blog-hero { padding:7rem 2rem 3rem; max-width:800px; margin:0 auto; }
+    .blog-tag { font-family:var(--font-mono); font-size:12px; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:1rem; display:block; }
+    .blog-title { font-family:var(--font-display); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; line-height:1.1; letter-spacing:-0.02em; margin-bottom:1.5rem; }
+    .blog-meta { display:flex; gap:1.5rem; font-family:var(--font-mono); font-size:12px; color:var(--muted); padding-bottom:2rem; border-bottom:1px solid var(--border); margin-bottom:3rem; flex-wrap:wrap; }
+    .blog-body { max-width:800px; margin:0 auto; padding:0 2rem 5rem; }
+    .blog-body h2 { font-family:var(--font-display); font-size:1.5rem; font-weight:800; margin:3rem 0 1rem; color:var(--text); }
+    .blog-body h3 { font-size:1.1rem; font-weight:600; margin:2rem 0 0.75rem; color:var(--text); }
+    .blog-body p { color:var(--muted); margin-bottom:1.25rem; line-height:1.85; }
+    .blog-body p strong { color:var(--text); }
+    .blog-body ul, .blog-body ol { color:var(--muted); margin:0 0 1.25rem 1.5rem; }
+    .blog-body li { margin-bottom:0.5rem; line-height:1.8; }
+    .blog-body li strong { color:var(--text); }
+    pre { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin:1.5rem 0; overflow-x:auto; }
+    code { font-family:var(--font-mono); font-size:13px; color:var(--accent); line-height:1.7; }
+    p code, li code { background:var(--bg-card); padding:2px 7px; border-radius:4px; font-size:13px; color:var(--accent); }
+    .callout { background:var(--bg-card); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:1.25rem 1.5rem; margin:2rem 0; }
+    .callout p { margin:0; color:var(--text); }
+    .callout-warn { border-left-color:#f59e0b; }
+    hr { border:none; border-top:1px solid var(--border); margin:3rem 0; }
+    table { width:100%; border-collapse:collapse; margin:1.5rem 0; font-size:14px; }
+    th { background:var(--bg-card); color:var(--text); font-weight:600; padding:0.75rem 1rem; text-align:left; border-bottom:1px solid var(--border); }
+    td { padding:0.65rem 1rem; color:var(--muted); border-bottom:1px solid var(--border); }
+    td strong { color:var(--text); }
+    .back-footer { text-align:center; padding:3rem 2rem 4rem; border-top:1px solid var(--border); }
+    .btn-back { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); color:var(--text); padding:0.75rem 1.6rem; border-radius:6px; font-weight:500; font-size:14px; text-decoration:none; transition:border-color 0.2s; }
+    .btn-back:hover { border-color:var(--accent); background:rgba(15,118,110,0.06); }
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .blog-hero,.blog-body{padding-left:1.25rem;padding-right:1.25rem;} }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">amal.jose ~$</a>
+  <a href="index.html#blog" class="nav-back">← Back to blog</a>
+</nav>
+<div class="blog-hero">
+  <span class="blog-tag">Automation · Security · Python · Jenkins</span>
+  <h1 class="blog-title">Automating certificate lifecycle end-to-end: from discovery to rotation with Python and Jenkins</h1>
+  <div class="blog-meta">
+    <span>Amal Jose</span><span>2025</span><span>7 min read</span><span>Cloud Operations & Automation Engineer</span>
+  </div>
+</div>
+<div class="blog-body">
+  <p>Certificate expiry incidents are one of the most embarrassing categories of production outage. They are not caused by bugs, complex infrastructure failures, or unexpected load — they are caused by a date on a calendar that everyone knew about and nobody acted on in time. I have seen APIs go dark, mutual TLS handshakes fail, and customers locked out — all because a cert expired at midnight and there was no automated process to catch it.</p>
+  <p>This post documents the end-to-end certificate lifecycle automation pipeline I built, covering discovery, triage, renewal via a CA API, and deployment — with secrets handled properly throughout.</p>
+
+  <h2>Where certificates live (and get forgotten)</h2>
+  <p>In any reasonably complex cloud environment, certificates appear across multiple systems:</p>
+  <ul>
+    <li><strong>Kubernetes secrets</strong> — TLS certs for ingress controllers and service-to-service mTLS</li>
+    <li><strong>Load balancer listeners</strong> — SSL termination certs on ALBs, NLBs, or nginx</li>
+    <li><strong>Application keystores</strong> — JKS or PKCS12 files embedded in application config</li>
+    <li><strong>API gateway configurations</strong> — client certs and backend mTLS certs</li>
+    <li><strong>Secret managers</strong> — Vault, AWS Secrets Manager, Azure Key Vault</li>
+  </ul>
+  <p>Each has a different API, a different renewal process, and usually a different owner. Before automation, the standard approach was a spreadsheet updated quarterly — which is not frequent enough for 90-day certificates.</p>
+
+  <h2>Pipeline architecture</h2>
+  <p>The automation runs as a Jenkins pipeline on a daily schedule with four stages:</p>
+  <ol>
+    <li><strong>Discovery</strong> — scan all certificate stores, collect expiry metadata</li>
+    <li><strong>Triage</strong> — classify by urgency: expired, critical (&lt;14 days), warning (&lt;30 days), healthy</li>
+    <li><strong>Renewal</strong> — for critical/warning certs, trigger renewal via CA API</li>
+    <li><strong>Deployment</strong> — push renewed certs to targets, validate, update secret stores</li>
+  </ol>
+
+  <h2>Stage 1: Discovery</h2>
+  <p>The discovery module queries each certificate source and normalises results into a common data model:</p>
+<pre><code>from dataclasses import dataclass
+from datetime import datetime, timezone
+
+@dataclass
+class CertRecord:
+    alias: str
+    source: str          # 'k8s', 'vault', 'aws_acm', 'file'
+    common_name: str
+    expiry: datetime
+    days_until_expiry: int
+    status: str          # 'expired' | 'critical' | 'warning' | 'healthy'
+    auto_renewable: bool
+    renewal_owner: str
+
+def classify(days: int) -> str:
+    if days <= 0:  return 'expired'
+    if days <= 14: return 'critical'
+    if days <= 30: return 'warning'
+    return 'healthy'</code></pre>
+
+  <h3>Discovering certs from Kubernetes</h3>
+<pre><code>from kubernetes import client, config
+from cryptography import x509
+from cryptography.hazmat.primitives.serialization import Encoding
+import base64
+
+def discover_k8s_certs(namespace='*') -> list[CertRecord]:
+    config.load_incluster_config()
+    v1 = client.CoreV1Api()
+    secrets = v1.list_secret_for_all_namespaces(field_selector='type=kubernetes.io/tls')
+    records = []
+    for s in secrets.items:
+        tls_crt = base64.b64decode(s.data['tls.crt'])
+        cert = x509.load_pem_x509_certificate(tls_crt)
+        expiry = cert.not_valid_after_utc
+        days = (expiry - datetime.now(timezone.utc)).days
+        records.append(CertRecord(
+            alias=f"{s.metadata.namespace}/{s.metadata.name}",
+            source='k8s',
+            common_name=cert.subject.get_attributes_for_oid(
+                x509.NameOID.COMMON_NAME)[0].value,
+            expiry=expiry,
+            days_until_expiry=days,
+            status=classify(days),
+            auto_renewable=True,
+            renewal_owner='platform-ops'
+        ))
+    return records</code></pre>
+
+  <h2>Stage 2: Triage and notification</h2>
+  <p>After discovery, the pipeline routes notifications to the right owners — not everyone for everything:</p>
+  <ul>
+    <li><strong>Expired or critical</strong> → immediate Slack alert to on-call channel + auto-create JIRA ticket</li>
+    <li><strong>Warning</strong> → daily digest to the ops channel</li>
+    <li><strong>Healthy</strong> → no notification (silence is signal-free)</li>
+    <li><strong>Auto-renewable + platform-owned</strong> → skip notification entirely, proceed directly to renewal</li>
+  </ul>
+
+  <h2>Stage 3: Renewal via CA API</h2>
+  <p>For publicly trusted certificates, renewal goes through your CA's API (Digicert, Sectigo, Let's Encrypt via ACME). The pattern is the same regardless of CA: generate a fresh key pair and CSR, submit to the CA, poll until issued.</p>
+<pre><code>from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+
+def generate_key_and_csr(common_name: str, sans: list[str]):
+    """Always generate a fresh key — never reuse the old one."""
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    csr = (
+        x509.CertificateSigningRequestBuilder()
+        .subject_name(x509.Name([
+            x509.NameAttribute(NameOID.COMMON_NAME, common_name),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Your Org"),
+        ]))
+        .add_extension(
+            x509.SubjectAlternativeName([x509.DNSName(n) for n in sans]),
+            critical=False,
+        )
+        .sign(key, hashes.SHA256())
+    )
+    key_pem = key.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.TraditionalOpenSSL,
+        serialization.NoEncryption()
+    )
+    csr_pem = csr.public_bytes(serialization.Encoding.PEM)
+    return key_pem, csr_pem
+
+def request_certificate(ca_api_url, api_key, csr_pem, common_name):
+    import requests
+    resp = requests.post(
+        f"{ca_api_url}/certificates",
+        headers={"X-API-Key": api_key},
+        json={"csr": csr_pem.decode(), "validity_days": 365, "cn": common_name}
+    )
+    resp.raise_for_status()
+    return resp.json()["order_id"]
+
+def poll_until_issued(ca_api_url, api_key, order_id, timeout=3600):
+    import requests, time
+    headers = {"X-API-Key": api_key}
+    start = time.time()
+    while time.time() - start < timeout:
+        r = requests.get(f"{ca_api_url}/orders/{order_id}", headers=headers).json()
+        if r["status"] == "issued":
+            return r["certificate_pem"]
+        if r["status"] == "failed":
+            raise Exception(f"CA rejected order {order_id}: {r.get('reason')}")
+        time.sleep(60)
+    raise TimeoutError(f"Order {order_id} not issued within {timeout}s")</code></pre>
+
+  <div class="callout callout-warn">
+    <p><strong>Security rule:</strong> Always generate a fresh private key on every renewal. Never reuse the existing key — if it was compromised during the certificate's lifetime, reusing it negates the entire point of renewal.</p>
+  </div>
+
+  <h2>Stage 4: Deployment</h2>
+  <h3>Kubernetes secrets</h3>
+<pre><code>def deploy_to_k8s(namespace, secret_name, cert_pem: bytes, key_pem: bytes):
+    from kubernetes import client, config
+    import base64
+    config.load_incluster_config()
+    v1 = client.CoreV1Api()
+    secret_body = client.V1Secret(
+        metadata=client.V1ObjectMeta(name=secret_name, namespace=namespace),
+        type='kubernetes.io/tls',
+        data={
+            'tls.crt': base64.b64encode(cert_pem).decode(),
+            'tls.key': base64.b64encode(key_pem).decode(),
+        }
+    )
+    try:
+        v1.replace_namespaced_secret(secret_name, namespace, secret_body)
+    except Exception:
+        v1.create_namespaced_secret(namespace, secret_body)
+
+    # Store private key in Vault — never keep it in memory longer than needed
+    store_key_in_vault(f"certs/{namespace}/{secret_name}/key", key_pem)
+    key_pem = None  # clear reference</code></pre>
+
+  <h3>Post-deployment validation</h3>
+<pre><code>import ssl, socket
+from cryptography import x509 as cx509
+
+def validate_deployed_cert(hostname: str, port: int, expected_serial: int) -> bool:
+    ctx = ssl.create_default_context()
+    with ctx.wrap_socket(socket.socket(), server_hostname=hostname) as s:
+        s.connect((hostname, port))
+        der = s.getpeercert(binary_form=True)
+    live_cert = cx509.load_der_x509_certificate(der)
+    return live_cert.serial_number == expected_serial</code></pre>
+
+  <h2>The Jenkinsfile</h2>
+<pre><code>pipeline {
+  agent any
+  triggers { cron('H 6 * * *') }  // run daily at 6am
+  stages {
+    stage('Discover') {
+      steps {
+        withCredentials([string(credentialsId: 'vault-token', variable: 'VAULT_TOKEN')]) {
+          sh 'python3 cert_pipeline.py discover --output inventory.json'
+        }
+      }
+    }
+    stage('Triage') {
+      steps {
+        sh 'python3 cert_pipeline.py triage --input inventory.json --output triage.json'
+        archiveArtifacts 'triage.json'
+      }
+    }
+    stage('Renew') {
+      steps {
+        withCredentials([string(credentialsId: 'ca-api-key', variable: 'CA_API_KEY')]) {
+          sh 'python3 cert_pipeline.py renew --input triage.json'
+        }
+      }
+    }
+    stage('Deploy & Validate') {
+      steps {
+        sh 'python3 cert_pipeline.py deploy --validate'
+      }
+      post {
+        failure {
+          slackSend channel: '#ops-alerts',
+            color: 'danger',
+            message: "Certificate deployment FAILED — manual intervention required"
+        }
+      }
+    }
+  }
+}</code></pre>
+
+  <h2>Results</h2>
+  <p>Since deploying this pipeline, there have been zero certificate expiry incidents. Certificates are renewed automatically 30 days before expiry. The operations team's involvement is limited to approving change requests for certs that require security sign-off. What was previously a quarterly manual audit that occasionally missed things is now a fully auditable, daily automated process with a clear trail from discovery through renewal through deployment.</p>
+  <p>If your team is still tracking certificates in a spreadsheet — or worse, relying on Outlook reminders — this is one of the highest-return automation investments you can make. The blast radius of a missed cert is high; the cost of building the automation is low.</p>
+</div>
+<div class="back-footer">
+  <a href="index.html#blog" class="btn-back">← Back to all posts</a>
+</div>
+</body>
+</html>

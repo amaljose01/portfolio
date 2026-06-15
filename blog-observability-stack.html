@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Building a Multi-Layer Observability Stack — Amal Jose</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#f0f2f5; --bg-card:#ffffff; --accent:#0f766e; --accent2:#2563eb; --text:#111827; --muted:#4b5563; --border:rgba(0,0,0,0.1); --font-display:'Syne',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace; }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:16px; line-height:1.7; overflow-x:hidden; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 3rem; background:rgba(240,242,245,0.92); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:var(--font-mono); font-size:15px; color:var(--accent); text-decoration:none; letter-spacing:0.05em; }
+    .nav-back { color:var(--muted); text-decoration:none; font-size:14px; font-weight:500; transition:color 0.2s; }
+    .nav-back:hover { color:var(--text); }
+    .blog-hero { padding:7rem 2rem 3rem; max-width:800px; margin:0 auto; }
+    .blog-tag { font-family:var(--font-mono); font-size:12px; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:1rem; display:block; }
+    .blog-title { font-family:var(--font-display); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; line-height:1.1; letter-spacing:-0.02em; margin-bottom:1.5rem; }
+    .blog-meta { display:flex; gap:1.5rem; font-family:var(--font-mono); font-size:12px; color:var(--muted); padding-bottom:2rem; border-bottom:1px solid var(--border); margin-bottom:3rem; flex-wrap:wrap; }
+    .blog-body { max-width:800px; margin:0 auto; padding:0 2rem 5rem; }
+    .blog-body h2 { font-family:var(--font-display); font-size:1.5rem; font-weight:800; margin:3rem 0 1rem; color:var(--text); }
+    .blog-body h3 { font-size:1.1rem; font-weight:600; margin:2rem 0 0.75rem; color:var(--text); }
+    .blog-body p { color:var(--muted); margin-bottom:1.25rem; line-height:1.85; }
+    .blog-body p strong { color:var(--text); }
+    .blog-body ul, .blog-body ol { color:var(--muted); margin:0 0 1.25rem 1.5rem; }
+    .blog-body li { margin-bottom:0.5rem; line-height:1.8; }
+    .blog-body li strong { color:var(--text); }
+    pre { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin:1.5rem 0; overflow-x:auto; }
+    code { font-family:var(--font-mono); font-size:13px; color:var(--accent); line-height:1.7; }
+    p code, li code { background:var(--bg-card); padding:2px 7px; border-radius:4px; font-size:13px; color:var(--accent); }
+    .callout { background:var(--bg-card); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:1.25rem 1.5rem; margin:2rem 0; }
+    .callout p { margin:0; color:var(--text); }
+    .callout-warn { border-left-color:#f59e0b; }
+    hr { border:none; border-top:1px solid var(--border); margin:3rem 0; }
+    table { width:100%; border-collapse:collapse; margin:1.5rem 0; font-size:14px; }
+    th { background:var(--bg-card); color:var(--text); font-weight:600; padding:0.75rem 1rem; text-align:left; border-bottom:1px solid var(--border); }
+    td { padding:0.65rem 1rem; color:var(--muted); border-bottom:1px solid var(--border); }
+    td strong { color:var(--text); }
+    .back-footer { text-align:center; padding:3rem 2rem 4rem; border-top:1px solid var(--border); }
+    .btn-back { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); color:var(--text); padding:0.75rem 1.6rem; border-radius:6px; font-weight:500; font-size:14px; text-decoration:none; transition:border-color 0.2s; }
+    .btn-back:hover { border-color:var(--accent); background:rgba(15,118,110,0.06); }
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .blog-hero,.blog-body{padding-left:1.25rem;padding-right:1.25rem;} }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">amal.jose ~$</a>
+  <a href="index.html#blog" class="nav-back">← Back to blog</a>
+</nav>
+<div class="blog-hero">
+  <span class="blog-tag">Observability · Prometheus · Grafana · Splunk</span>
+  <h1 class="blog-title">Building a multi-layer observability stack: Prometheus, Grafana, and Splunk without the noise</h1>
+  <div class="blog-meta">
+    <span>Amal Jose</span><span>2025</span><span>9 min read</span><span>Cloud Operations & Automation Engineer</span>
+  </div>
+</div>
+<div class="blog-body">
+  <p>Every platform team I have worked on eventually arrives at the same uncomfortable realisation: having monitoring tools is not the same as having observability. You can have Prometheus, Grafana, and Splunk all running simultaneously and still find yourself SSH-ing into a server at 3am trying to understand what is happening — because the tools are generating noise, not signal.</p>
+  <p>This post is about how I have structured multi-tool observability stacks to actually work in production: clear ownership boundaries between tools, alert rules that mean something, dashboards engineers actually open during incidents, and a log pipeline that does not cost more than the application it monitors.</p>
+
+  <h2>The problem: tools without a strategy</h2>
+  <p>The typical evolution looks like this. A team starts with basic server metrics — CPU, memory, disk. They install Prometheus and add a Grafana dashboard. Things break in production and they cannot understand why from metrics alone, so they add centralised logging with Splunk or ELK. A new service gets an APM agent. Someone adds PagerDuty. Now every incident generates five concurrent notifications across three tools, none of which tell the engineer where to look first.</p>
+  <p>The fix is not removing tools. It is assigning each tool a lane and enforcing it.</p>
+
+  <h2>The observability layer model</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>Tool</th><th>Owns</th><th>Does NOT own</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Metrics</strong></td><td>Prometheus + Grafana</td><td>Infrastructure health, K8s resource utilisation, SLO burn rate, custom business metrics</td><td>Log-derived insights, distributed traces</td></tr>
+      <tr><td><strong>Logs</strong></td><td>Splunk / Loki</td><td>Structured log search, error pattern detection, compliance audit trail</td><td>Time-series metrics, service topology</td></tr>
+      <tr><td><strong>Traces</strong></td><td>Jaeger / Tempo</td><td>Request lifecycle, latency breakdown, cross-service dependencies</td><td>Infrastructure metrics, raw log storage</td></tr>
+      <tr><td><strong>Alerting</strong></td><td>Alertmanager + PagerDuty</td><td>Routing, deduplication, silencing, escalation</td><td>Alert definition — that belongs to each source tool</td></tr>
+    </tbody>
+  </table>
+  <p>The critical rule: <strong>each tool alerts only on what it uniquely knows.</strong> Prometheus does not fire alerts on log error patterns — that is Splunk's job. Splunk does not alert on pod memory pressure — that is Prometheus. The moment a signal appears in two alerting systems simultaneously, you have duplication that will cause alert fatigue.</p>
+
+  <h2>Prometheus: metrics done right</h2>
+  <h3>kube-prometheus-stack as your foundation</h3>
+  <p>Deploy via the <code>kube-prometheus-stack</code> Helm chart. It bundles Prometheus Operator, a curated set of recording rules, default Kubernetes dashboards, and Alertmanager. Do not start from scratch — the defaults are excellent and you can override what you need.</p>
+<pre><code>prometheus:
+  prometheusSpec:
+    retention: 30d
+    retentionSize: 50GB
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: fast-ssd
+          resources:
+            requests:
+              storage: 100Gi
+
+alertmanager:
+  config:
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 30s
+      repeat_interval: 12h
+      routes:
+        - match: { severity: critical }
+          receiver: pagerduty-critical
+        - match: { severity: warning }
+          receiver: slack-warning</code></pre>
+
+  <h3>Alert rules that do not cry wolf</h3>
+  <p>The most common Prometheus anti-pattern is threshold alerts: "alert if CPU above 80%." These fire constantly on healthy systems doing real work and get ignored. Replace them with rate-of-change alerts, sustained-condition alerts, and SLO burn rate alerts.</p>
+<pre><code>groups:
+  - name: slo-burn-rate
+    rules:
+      - alert: HighErrorBudgetBurnRate
+        expr: |
+          (
+            rate(http_requests_total{status=~"5.."}[1h])
+            / rate(http_requests_total[1h])
+          ) > (5 * 0.001)
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error budget burn on {{ $labels.service }}"
+          runbook: "https://runbooks.example.com/high-error-rate"
+
+      - alert: PodMemoryPressureSustained
+        expr: |
+          container_memory_working_set_bytes
+          / container_spec_memory_limit_bytes > 0.9
+        for: 15m    # sustained 15 min, not a spike
+        labels:
+          severity: warning</code></pre>
+
+  <h3>Custom business metrics via exporters</h3>
+  <p>Infrastructure metrics tell you the platform is running. Business metrics tell you it is doing useful work. Build lightweight exporters that scrape your application's internal APIs and expose metrics in Prometheus format:</p>
+<pre><code>from prometheus_client import start_http_server, Gauge, Counter
+import requests, time
+
+QUEUE_DEPTH     = Gauge('job_queue_depth', 'Jobs waiting', ['queue_name'])
+PROCESSED_TOTAL = Counter('jobs_processed_total', 'Jobs completed', ['status'])
+P99_LATENCY     = Gauge('job_processing_seconds_p99', 'P99 latency')
+
+def collect():
+    stats = requests.get('http://app/internal/stats').json()
+    for q in stats['queues']:
+        QUEUE_DEPTH.labels(queue_name=q['name']).set(q['depth'])
+    P99_LATENCY.set(stats['latency_p99'])
+
+if __name__ == '__main__':
+    start_http_server(9100)
+    while True:
+        collect()
+        time.sleep(30)</code></pre>
+
+  <h2>Grafana: dashboards engineers actually open</h2>
+  <h3>Dashboard-as-code with provisioning</h3>
+  <p>Store all dashboards as JSON in Git. Grafana's sidecar provisioner loads them automatically on startup — no manual import, no dashboards that only exist on one instance. Changes go through PR review like any other code change.</p>
+<pre><code>grafana:
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      searchNamespace: ALL
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-service-dashboard
+  labels:
+    grafana_dashboard: "1"
+data:
+  my-service.json: |
+    { ... dashboard JSON ... }</code></pre>
+
+  <h3>USE and RED as your panel template</h3>
+  <p>Every service dashboard should answer two sets of questions. For infrastructure resources (USE): <strong>Utilisation</strong>, <strong>Saturation</strong>, <strong>Errors</strong>. For user-facing services (RED): <strong>Rate</strong>, <strong>Errors</strong>, <strong>Duration</strong>. A dashboard that answers these six questions clearly for each critical service is more valuable than a 40-panel dashboard that answers none of them decisively.</p>
+
+  <h2>Splunk: logs as a first-class signal</h2>
+  <h3>Index strategy by retention, not by application</h3>
+<pre><code>[application_logs]
+frozenTimePeriodInSecs = 7776000     # 90 days
+
+[audit_logs]
+frozenTimePeriodInSecs = 31536000    # 1 year
+coldToFrozenDir = /archive/audit
+
+[debug_logs]
+frozenTimePeriodInSecs = 604800      # 7 days — no reason to keep debug logs longer</code></pre>
+
+  <h3>Structured logging: the ops contract</h3>
+  <p>When every log line has consistent fields — <code>level</code>, <code>service</code>, <code>trace_id</code>, <code>duration_ms</code>, <code>error_code</code> — Splunk searches become trivial and dashboards build themselves. Raw text logs are a symptom of an application that was not designed to be operated.</p>
+<pre><code># Unstructured — painful to query:
+index=app_logs "ERROR" | rex "user (?&lt;user_id&gt;\d+) failed"
+
+# Structured JSON — instant:
+index=app_logs level=ERROR | stats count by service, error_code</code></pre>
+
+  <div class="callout callout-warn">
+    <p><strong>Enforce structured logging at the framework level.</strong> Add a logging middleware or base logger to your internal libraries so teams get structured logs by default, not as an afterthought.</p>
+  </div>
+
+  <h2>Alertmanager: the routing brain</h2>
+  <p>Alertmanager routes, deduplicates, and silences — it does not define alerts. Keep alert rules in Prometheus. Use Alertmanager exclusively for deciding who gets paged, when, and how. The routing tree that works in practice:</p>
+  <ul>
+    <li><strong>Critical + production</strong> → PagerDuty, immediate page</li>
+    <li><strong>Warning + production</strong> → Slack ops channel, no page</li>
+    <li><strong>Any + non-production</strong> → Slack dev channel, no page, no escalation</li>
+    <li><strong>Informational</strong> → logged to summary index, no notification</li>
+  </ul>
+  <p>Inhibition rules are equally important. When a node goes down, suppress the cascade of pod-level alerts that fire as a consequence — they are not independent problems.</p>
+<pre><code>inhibit_rules:
+  - source_match:
+      alertname: NodeDown
+    target_match_re:
+      alertname: (PodNotReady|PodCrashLooping|DeploymentReplicasMismatch)
+    equal: ['node']</code></pre>
+
+  <h2>The result</h2>
+  <p>After restructuring observability along these lines on a large cloud platform: alert volume dropped roughly 60%. Mean time to acknowledge dropped because each alert arrived with a clear owner and a runbook link. Mean time to diagnose dropped because engineers knew exactly which tool to open for each alert type. And post-incident reviews shifted from "why did we not know about this?" to "here is exactly what happened and when."</p>
+  <p>Observability is not a tool purchase. It is an engineering discipline. The tools are just the implementation.</p>
+</div>
+<div class="back-footer">
+  <a href="index.html#blog" class="btn-back">← Back to all posts</a>
+</div>
+</body>
+</html>

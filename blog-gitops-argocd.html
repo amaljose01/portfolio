@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitOps in Practice: ArgoCD for Multi-Environment Deployments — Amal Jose</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#f0f2f5; --bg-card:#ffffff; --bg-card2:#e8eaed; --accent:#0f766e; --accent2:#2563eb; --text:#111827; --muted:#4b5563; --border:rgba(0,0,0,0.1); --font-display:'Syne',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace; }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:16px; line-height:1.7; overflow-x:hidden; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 3rem; background:rgba(240,242,245,0.92); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:var(--font-mono); font-size:15px; color:var(--accent); text-decoration:none; letter-spacing:0.05em; }
+    .nav-back { color:var(--muted); text-decoration:none; font-size:14px; font-weight:500; transition:color 0.2s; }
+    .nav-back:hover { color:var(--text); }
+    .blog-hero { padding:7rem 2rem 3rem; max-width:800px; margin:0 auto; }
+    .blog-tag { font-family:var(--font-mono); font-size:12px; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:1rem; display:block; }
+    .blog-title { font-family:var(--font-display); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; line-height:1.1; letter-spacing:-0.02em; margin-bottom:1.5rem; }
+    .blog-meta { display:flex; gap:1.5rem; font-family:var(--font-mono); font-size:12px; color:var(--muted); padding-bottom:2rem; border-bottom:1px solid var(--border); margin-bottom:3rem; flex-wrap:wrap; }
+    .blog-body { max-width:800px; margin:0 auto; padding:0 2rem 5rem; }
+    .blog-body h2 { font-family:var(--font-display); font-size:1.5rem; font-weight:800; margin:3rem 0 1rem; color:var(--text); }
+    .blog-body h3 { font-size:1.1rem; font-weight:600; margin:2rem 0 0.75rem; color:var(--text); }
+    .blog-body p { color:var(--muted); margin-bottom:1.25rem; line-height:1.85; }
+    .blog-body p strong { color:var(--text); }
+    .blog-body ul, .blog-body ol { color:var(--muted); margin:0 0 1.25rem 1.5rem; }
+    .blog-body li { margin-bottom:0.5rem; line-height:1.8; }
+    .blog-body li strong { color:var(--text); }
+    pre { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin:1.5rem 0; overflow-x:auto; }
+    code { font-family:var(--font-mono); font-size:13px; color:var(--accent); line-height:1.7; }
+    p code, li code { background:var(--bg-card); padding:2px 7px; border-radius:4px; font-size:13px; color:var(--accent); }
+    .callout { background:var(--bg-card); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:1.25rem 1.5rem; margin:2rem 0; }
+    .callout p { margin:0; color:var(--text); }
+    .callout-warn { border-left-color:#f59e0b; }
+    hr { border:none; border-top:1px solid var(--border); margin:3rem 0; }
+    table { width:100%; border-collapse:collapse; margin:1.5rem 0; font-size:14px; }
+    th { background:var(--bg-card); color:var(--text); font-weight:600; padding:0.75rem 1rem; text-align:left; border-bottom:1px solid var(--border); }
+    td { padding:0.65rem 1rem; color:var(--muted); border-bottom:1px solid var(--border); }
+    td strong { color:var(--text); }
+    .back-footer { text-align:center; padding:3rem 2rem 4rem; border-top:1px solid var(--border); }
+    .btn-back { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); color:var(--text); padding:0.75rem 1.6rem; border-radius:6px; font-weight:500; font-size:14px; text-decoration:none; transition:border-color 0.2s; }
+    .btn-back:hover { border-color:var(--accent); background:rgba(15,118,110,0.06); }
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .blog-hero,.blog-body{padding-left:1.25rem;padding-right:1.25rem;} }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">amal.jose ~$</a>
+  <a href="index.html#blog" class="nav-back">← Back to blog</a>
+</nav>
+
+<div class="blog-hero">
+  <span class="blog-tag">GitOps · ArgoCD · Kubernetes</span>
+  <h1 class="blog-title">GitOps in practice: structuring ArgoCD for multi-environment deployments</h1>
+  <div class="blog-meta">
+    <span>Amal Jose</span>
+    <span>2025</span>
+    <span>8 min read</span>
+    <span>Cloud Operations & Automation Engineer</span>
+  </div>
+</div>
+
+<div class="blog-body">
+
+  <p>GitOps sounds simple on paper: Git is the source of truth, and your cluster converges to whatever is in the repo. In practice, most teams get about three environments in before the repository structure collapses under its own weight — duplicated manifests, unclear promotion paths, and drift that nobody notices until production looks nothing like staging.</p>
+
+  <p>I've set up ArgoCD-based GitOps across several production environments, and this post documents the patterns that held up: how to structure your repo, how to use ApplicationSets properly, how to handle secrets, and how to design a promotion flow that's both safe and fast.</p>
+
+  <h2>The repo structure problem</h2>
+
+  <p>The most common GitOps mistake is treating your repository like a folder of kubectl apply files. It works for one environment. Add a second environment and you're already copy-pasting. Add a third and you have a synchronisation problem masquerading as a deployment problem.</p>
+
+  <p>The structure that works well at scale separates three concerns:</p>
+
+  <ul>
+    <li><strong>Application definitions</strong> — what you're deploying (Helm charts, base manifests)</li>
+    <li><strong>Environment configuration</strong> — how it's configured per environment (values overrides)</li>
+    <li><strong>Cluster configuration</strong> — what ArgoCD applications exist on which cluster</li>
+  </ul>
+
+<pre><code>gitops-repo/
+├── apps/
+│   ├── my-service/
+│   │   ├── Chart.yaml
+│   │   ├── templates/
+│   │   ├── values.yaml           # shared defaults
+│   │   ├── values-dev.yaml
+│   │   ├── values-staging.yaml
+│   │   └── values-prod.yaml
+│   └── platform-components/
+│       ├── cert-manager/
+│       ├── external-secrets/
+│       └── ingress-nginx/
+├── clusters/
+│   ├── dev/
+│   │   └── apps.yaml             # ArgoCD App-of-Apps for dev
+│   ├── staging/
+│   │   └── apps.yaml
+│   └── prod/
+│       └── apps.yaml
+└── argocd/
+    ├── projects/
+    └── applicationsets/</code></pre>
+
+  <p>The <code>clusters/</code> directory is the entry point for ArgoCD. Each cluster has a single App-of-Apps (or ApplicationSet) that bootstraps everything else. New environments are added by creating a new directory here, not by duplicating anything in <code>apps/</code>.</p>
+
+  <h2>ApplicationSet: one template, all environments</h2>
+
+  <p>ApplicationSet is ArgoCD's multiplier. Instead of creating individual Application objects per environment, you define a template once and generate applications dynamically. This is the pattern I use for services that need to run across dev, staging, and prod:</p>
+
+<pre><code>apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: my-service
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: dev
+            cluster: https://dev-cluster.example.com
+            namespace: my-service-dev
+            autosync: "true"
+          - env: staging
+            cluster: https://staging-cluster.example.com
+            namespace: my-service-staging
+            autosync: "true"
+          - env: prod
+            cluster: https://prod-cluster.example.com
+            namespace: my-service-prod
+            autosync: "false"    # prod is manual sync only
+  template:
+    metadata:
+      name: 'my-service-{{env}}'
+      annotations:
+        notifications.argoproj.io/subscribe.on-sync-failed.slack: ops-alerts
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/your-org/gitops-repo
+        targetRevision: main
+        path: apps/my-service
+        helm:
+          valueFiles:
+            - values.yaml
+            - 'values-{{env}}.yaml'
+      destination:
+        server: '{{cluster}}'
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: '{{autosync}}'
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true</code></pre>
+
+  <div class="callout callout-warn">
+    <p><strong>Production sync policy:</strong> Always set <code>autosync: false</code> for production. Automated self-healing on prod means a mistyped config in Git gets applied instantly. Manual sync keeps a human in the loop for the last mile.</p>
+  </div>
+
+  <h2>Sync waves: ordering your deployments</h2>
+
+  <p>When multiple resources deploy together, order matters. CRDs before controllers. ConfigMaps before Deployments. Databases before applications. ArgoCD sync waves handle this with a single annotation:</p>
+
+<pre><code># Wave 0: infrastructure (CRDs, namespaces, RBAC)
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+
+# Wave 1: config and secrets
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+
+# Wave 2: databases and stateful services
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+
+# Wave 3: application workloads
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+
+# Wave 4: ingress and external routing
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"</code></pre>
+
+  <p>Resources in wave 0 must be healthy before wave 1 starts. This eliminates an entire category of "it worked the second time" failures caused by resource creation race conditions.</p>
+
+  <h2>Secrets: what never goes in Git</h2>
+
+  <p>The GitOps security rule is absolute: no secrets in Git, ever, even encrypted. The two patterns I've used in production:</p>
+
+  <h3>External Secrets Operator + Vault</h3>
+  <p>ExternalSecret manifests live in Git. They contain only a reference to where the secret lives in Vault — not the value. The External Secrets Operator reads the reference and creates a native Kubernetes Secret at runtime.</p>
+
+<pre><code>apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: database-credentials
+  namespace: my-service-prod
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: database-credentials
+    creationPolicy: Owner
+  data:
+    - secretKey: DB_PASSWORD
+      remoteRef:
+        key: my-service/prod/database
+        property: password
+    - secretKey: DB_USERNAME
+      remoteRef:
+        key: my-service/prod/database
+        property: username</code></pre>
+
+  <h3>Sealed Secrets (for teams without Vault)</h3>
+  <p>Sealed Secrets encrypts a secret with a cluster-specific public key. The encrypted SealedSecret is safe to commit — only that specific cluster can decrypt it. Simpler to set up than Vault, but less flexible for rotation and cross-cluster sharing.</p>
+
+  <h2>Promotion flow: dev → staging → prod</h2>
+
+  <p>A GitOps promotion flow should be explicit, reviewable, and produce an audit trail. Here's the pattern:</p>
+
+  <ol>
+    <li><strong>Dev auto-deploys</strong> on every merge to <code>main</code> — ArgoCD picks up the commit and syncs within 3 minutes.</li>
+    <li><strong>Staging promotion</strong> is triggered by updating <code>values-staging.yaml</code> with the new image tag. This happens via a CI pipeline step that opens a PR. A team member reviews and merges.</li>
+    <li><strong>Production promotion</strong> follows the same PR process for <code>values-prod.yaml</code>, with a required approval from a senior engineer or release manager. After merge, ArgoCD shows the app OutOfSync — a human triggers the sync.</li>
+  </ol>
+
+<pre><code># CI pipeline step: create promotion PR (GitHub Actions example)
+- name: Promote to staging
+  run: |
+    git checkout -b promote/my-service-${{ env.IMAGE_TAG }}
+    
+    # Update image tag in staging values
+    yq e '.image.tag = "${{ env.IMAGE_TAG }}"' \
+      -i apps/my-service/values-staging.yaml
+    
+    git add apps/my-service/values-staging.yaml
+    git commit -m "chore: promote my-service ${{ env.IMAGE_TAG }} to staging"
+    git push origin promote/my-service-${{ env.IMAGE_TAG }}
+    
+    gh pr create \
+      --title "Promote my-service ${{ env.IMAGE_TAG }} to staging" \
+      --body "Automated promotion from dev. Review diff before merging." \
+      --base main</code></pre>
+
+  <p>Every promotion is a pull request. Every production deployment is a commit in Git. The full deployment history is a <code>git log</code> away. When an incident happens at 2am, you're not wondering what changed — you're reading the PR that caused it.</p>
+
+  <h2>Drift detection and self-healing</h2>
+
+  <p>One of GitOps's most underrated operational benefits is drift detection. ArgoCD continuously compares the live cluster state against the declared state in Git. When they diverge — someone ran a one-off <code>kubectl edit</code> during an incident, a node replacement changed a resource — ArgoCD surfaces it immediately.</p>
+
+  <p>For non-production clusters, <code>selfHeal: true</code> automatically reconciles drift. For production, I prefer drift to surface as an alert rather than an automatic revert — an emergency manual change might be intentional, and you want to decide deliberately whether to revert it or codify it in Git.</p>
+
+  <h2>Common pitfalls</h2>
+
+  <ul>
+    <li><strong>Too many applications, not enough projects.</strong> ArgoCD projects are your RBAC and network policy boundary. Structure projects around teams or delivery domains, not individual services.</li>
+    <li><strong>Ignoring health checks.</strong> ArgoCD's sync status (Synced/OutOfSync) and health status (Healthy/Degraded) are different things. A deployment can be Synced but Degraded if the pods aren't running. Always watch both.</li>
+    <li><strong>Not setting resource limits.</strong> ArgoCD will faithfully apply whatever is in your manifests — including manifests with no resource limits. Set limits in your Helm chart defaults and enforce them via OPA/Kyverno policies.</li>
+    <li><strong>Forgetting about CRD upgrades.</strong> When a Helm chart bumps a CRD version, ArgoCD won't automatically upgrade existing CRDs — it's a known limitation. Handle CRD upgrades explicitly in your release process.</li>
+  </ul>
+
+  <h2>Is it worth it?</h2>
+
+  <p>Every team I've introduced GitOps to has asked this question during the first week, usually while debugging a sync wave issue or a resource ordering problem. The answer becomes clear around week three, when a junior engineer confidently deploys to production because the process is just "open a PR," and when a post-incident review traces the exact config change that caused a problem to a specific commit with a specific author and a specific review approval.</p>
+
+  <p>GitOps doesn't eliminate complexity. It makes complexity legible. That's the whole value.</p>
+
+</div>
+<div class="back-footer">
+  <a href="index.html#blog" class="btn-back">← Back to all posts</a>
+</div>
+</body>
+</html>

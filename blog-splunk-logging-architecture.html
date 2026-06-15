@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Centralised Logging Architecture with Splunk — Amal Jose</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#f0f2f5; --bg-card:#ffffff; --accent:#0f766e; --accent2:#2563eb; --text:#111827; --muted:#4b5563; --border:rgba(0,0,0,0.1); --font-display:'Syne',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace; }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:16px; line-height:1.7; overflow-x:hidden; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 3rem; background:rgba(240,242,245,0.92); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:var(--font-mono); font-size:15px; color:var(--accent); text-decoration:none; letter-spacing:0.05em; }
+    .nav-back { color:var(--muted); text-decoration:none; font-size:14px; font-weight:500; transition:color 0.2s; }
+    .nav-back:hover { color:var(--text); }
+    .blog-hero { padding:7rem 2rem 3rem; max-width:800px; margin:0 auto; }
+    .blog-tag { font-family:var(--font-mono); font-size:12px; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:1rem; display:block; }
+    .blog-title { font-family:var(--font-display); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; line-height:1.1; letter-spacing:-0.02em; margin-bottom:1.5rem; }
+    .blog-meta { display:flex; gap:1.5rem; font-family:var(--font-mono); font-size:12px; color:var(--muted); padding-bottom:2rem; border-bottom:1px solid var(--border); margin-bottom:3rem; flex-wrap:wrap; }
+    .blog-body { max-width:800px; margin:0 auto; padding:0 2rem 5rem; }
+    .blog-body h2 { font-family:var(--font-display); font-size:1.5rem; font-weight:800; margin:3rem 0 1rem; color:var(--text); }
+    .blog-body h3 { font-size:1.1rem; font-weight:600; margin:2rem 0 0.75rem; color:var(--text); }
+    .blog-body p { color:var(--muted); margin-bottom:1.25rem; line-height:1.85; }
+    .blog-body p strong { color:var(--text); }
+    .blog-body ul, .blog-body ol { color:var(--muted); margin:0 0 1.25rem 1.5rem; }
+    .blog-body li { margin-bottom:0.5rem; line-height:1.8; }
+    .blog-body li strong { color:var(--text); }
+    pre { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin:1.5rem 0; overflow-x:auto; }
+    code { font-family:var(--font-mono); font-size:13px; color:var(--accent); line-height:1.7; }
+    p code, li code { background:var(--bg-card); padding:2px 7px; border-radius:4px; font-size:13px; color:var(--accent); }
+    .callout { background:var(--bg-card); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:1.25rem 1.5rem; margin:2rem 0; }
+    .callout p { margin:0; color:var(--text); }
+    .callout-warn { border-left-color:#f59e0b; }
+    hr { border:none; border-top:1px solid var(--border); margin:3rem 0; }
+    table { width:100%; border-collapse:collapse; margin:1.5rem 0; font-size:14px; }
+    th { background:var(--bg-card); color:var(--text); font-weight:600; padding:0.75rem 1rem; text-align:left; border-bottom:1px solid var(--border); }
+    td { padding:0.65rem 1rem; color:var(--muted); border-bottom:1px solid var(--border); }
+    td strong { color:var(--text); }
+    .back-footer { text-align:center; padding:3rem 2rem 4rem; border-top:1px solid var(--border); }
+    .btn-back { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); color:var(--text); padding:0.75rem 1.6rem; border-radius:6px; font-weight:500; font-size:14px; text-decoration:none; transition:border-color 0.2s; }
+    .btn-back:hover { border-color:var(--accent); background:rgba(15,118,110,0.06); }
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .blog-hero,.blog-body{padding-left:1.25rem;padding-right:1.25rem;} }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">amal.jose ~$</a>
+  <a href="index.html#blog" class="nav-back">← Back to blog</a>
+</nav>
+<div class="blog-hero">
+  <span class="blog-tag">Logging · Splunk · Architecture · Observability</span>
+  <h1 class="blog-title">Centralised logging architecture: building a production-grade Splunk setup across multiple data centres</h1>
+  <div class="blog-meta">
+    <span>Amal Jose</span><span>2024</span><span>11 min read</span><span>Cloud Operations & Automation Engineer</span>
+  </div>
+</div>
+<div class="blog-body">
+
+  <p>When the logging story for your platform is "SSH into the server and grep the file," you are not operating — you are guessing. I have been in that position, managing hundreds of application servers across multiple data centres with no centralised visibility, and I have built the Splunk infrastructure that replaced it. This post documents the architecture decisions that scaled from 50GB/day to 500GB/day, and the mistakes I would avoid if starting over.</p>
+
+  <h2>Requirements before architecture</h2>
+  <p>The architecture you need depends entirely on what you are trying to achieve. For the platform I was working on, the requirements were:</p>
+  <ul>
+    <li><strong>Centralised search</strong> — one query interface for logs from all data centres</li>
+    <li><strong>Near-real-time ingestion</strong> — logs searchable within 60 seconds of generation</li>
+    <li><strong>High availability</strong> — no single indexer failure causes log loss or search degradation</li>
+    <li><strong>Multi-tier retention</strong> — 90 days for operational logs, 1 year for audit logs</li>
+    <li><strong>Data residency</strong> — logs must not leave the DC they originate from (compliance requirement)</li>
+    <li><strong>Scale headroom</strong> — design for 10x current volume without re-architecting</li>
+  </ul>
+  <p>The data residency constraint was the one that shaped everything. It ruled out a single central indexer and pointed directly toward a federated architecture.</p>
+
+  <h2>The federated architecture</h2>
+  <p>The solution: independent indexer clusters per data centre, unified by a central Search Head Cluster that queries all of them simultaneously. Raw logs stay in their origin DC. Search results travel to the Search Head — which is a much smaller payload than raw log data.</p>
+
+<pre><code>  [Data Centre EU]              [Data Centre US]
+  ┌──────────────────┐          ┌──────────────────┐
+  │  Heavy Forwarder │          │  Heavy Forwarder │
+  │  (parsing tier)  │          │  (parsing tier)  │
+  └────────┬─────────┘          └────────┬─────────┘
+           │                             │
+  ┌────────▼──────────┐         ┌────────▼──────────┐
+  │  Indexer Cluster  │         │  Indexer Cluster  │
+  │  3 nodes, RF=2    │         │  3 nodes, RF=2    │
+  └───────────────────┘         └───────────────────┘
+           │                             │
+           └──────────────┬──────────────┘
+                          │
+               ┌──────────▼──────────┐
+               │  Search Head Cluster │
+               │  3 nodes + Deployer  │
+               └──────────────────────┘</code></pre>
+
+  <p>From the analyst's perspective, it looks like a single Splunk instance. A search like <code>index=app_logs error | stats count by host</code> fans out to both DC clusters simultaneously, and the Search Head merges and presents unified results.</p>
+
+  <h2>The forwarder tier</h2>
+  <h3>Universal Forwarders on every host</h3>
+  <p>Universal Forwarders (UFs) are lightweight — they read log files and ship raw data, no parsing. Every application server runs one. Deployment was automated via Ansible so every forwarder is identical and any new server gets a UF automatically on provisioning.</p>
+<pre><code># Ansible: deploy and configure Splunk UF
+- name: Install Universal Forwarder
+  package:
+    name: splunkforwarder
+    state: present
+
+- name: Configure outputs (points to Heavy Forwarder)
+  template:
+    src: outputs.conf.j2
+    dest: /opt/splunkforwarder/etc/system/local/outputs.conf
+  notify: restart splunkforwarder
+
+- name: Configure inputs (which log files to watch)
+  template:
+    src: "inputs-{{ server_role }}.conf.j2"
+    dest: /opt/splunkforwarder/etc/system/local/inputs.conf
+  notify: restart splunkforwarder</code></pre>
+
+  <p>The <code>inputs.conf</code> template is parameterised by <code>server_role</code> — app servers, database servers, and middleware watch different log paths. This keeps the forwarder config consistent and auditable.</p>
+
+  <h3>Heavy Forwarders as the parsing tier</h3>
+  <p>Heavy Forwarders (HFs) sit between the UFs and the indexer clusters. Their job is to parse, transform, and route events before indexing. Keeping parsing logic on the HF tier means updates do not require touching every application server, and the indexers stay focused on indexing.</p>
+<pre><code># transforms.conf on Heavy Forwarder
+[application_sourcetype]
+REGEX = ^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)\s+(\w+)\s+\[([^\]]+)\]\s+(.*)$
+FORMAT = timestamp::$1 level::$2 logger::$3 message::$4
+
+# Route audit events to the audit index automatically
+[route_to_audit]
+REGEX = AUDIT_EVENT|SECURITY_EVENT
+DEST_KEY = _MetaData:Index
+FORMAT = audit_logs</code></pre>
+
+  <h2>Indexer cluster configuration</h2>
+  <p>Each DC runs a 3-node indexer cluster with replication factor 2 and search factor 2. One node can fail without data loss or search impact.</p>
+<pre><code># server.conf on cluster manager
+[clustering]
+mode = manager
+replication_factor = 2
+search_factor = 2
+cluster_label = DC-EU
+pass4SymmKey = $7$&lt;encrypted_key&gt;
+
+# On each indexer peer
+[clustering]
+mode = peer
+manager_uri = https://cluster-manager-eu:8089
+pass4SymmKey = $7$&lt;encrypted_key&gt;</code></pre>
+
+  <h3>Index design by retention</h3>
+  <p>Structure indexes by retention requirement and data sensitivity — not by application. Mixing 90-day operational logs with 1-year audit logs in the same index means your retention policy is always wrong for some data.</p>
+<pre><code># indexes.conf
+[application_logs]
+homePath   = $SPLUNK_DB/application_logs/db
+coldPath   = $SPLUNK_DB/application_logs/colddb
+thawedPath = $SPLUNK_DB/application_logs/thaweddb
+frozenTimePeriodInSecs = 7776000    # 90 days
+maxTotalDataSizeMB = 300000
+
+[audit_logs]
+homePath   = $SPLUNK_DB/audit_logs/db
+coldPath   = $SPLUNK_DB/audit_logs/colddb
+thawedPath = $SPLUNK_DB/audit_logs/thaweddb
+frozenTimePeriodInSecs = 31536000   # 1 year
+coldToFrozenDir = /nfs/archive/audit  # archive before deletion
+
+[debug_logs]
+frozenTimePeriodInSecs = 604800     # 7 days — debug logs have no long-term value
+maxTotalDataSizeMB = 30000</code></pre>
+
+  <h2>Search Head Cluster</h2>
+  <p>Three search heads behind a load balancer, with a Deployer for pushing config changes across the cluster. The distributed search configuration is what allows a single query to span both DC clusters:</p>
+<pre><code># distsearch.conf on each Search Head
+[distributedSearch]
+servers = https://idx-eu-1:8089, https://idx-eu-2:8089, https://idx-eu-3:8089, \
+          https://idx-us-1:8089, https://idx-us-2:8089, https://idx-us-3:8089
+
+[searchGroup:dc-eu]
+servers = https://idx-eu-1:8089, https://idx-eu-2:8089, https://idx-eu-3:8089
+
+[searchGroup:dc-us]
+servers = https://idx-us-1:8089, https://idx-us-2:8089, https://idx-us-3:8089</code></pre>
+
+  <h2>Dashboard architecture</h2>
+  <p>We built three tiers of dashboards, each serving a different audience and use case:</p>
+
+  <h3>Tier 1: Operations command centre</h3>
+  <p>A single auto-refreshing dashboard showing real-time error rates, ingestion volume, and service health across all DCs. Designed for a NOC screen — no interaction needed. Updates every 60 seconds. Everything is a sparkline or a single number.</p>
+
+  <h3>Tier 2: Service-specific dashboards</h3>
+  <p>One dashboard per major application domain, each showing the same panel layout (error rate, latency P50/P95/P99, top error types, request volume) filtered to that domain's source types. Teams own their own dashboard via a parameterised template — they add panels to a team-specific section without touching the shared structure.</p>
+
+  <h3>Tier 3: Incident investigation dashboards</h3>
+  <p>Parameterised investigation dashboards where the analyst inputs a time range, a service name, and optionally an error type or user ID. The dashboard surfaces a summary → error breakdown → sample raw logs drill-down, guiding structured investigation rather than free-form search. These dashboards alone reduced mean time to diagnose by 40% — because structured investigation is faster than starting from a blank search bar every time.</p>
+
+  <h2>Alerting strategy</h2>
+  <p>Splunk alert routing by severity:</p>
+  <ul>
+    <li><strong>Critical</strong> — PagerDuty webhook, immediate page to on-call</li>
+    <li><strong>Warning</strong> — Slack to ops channel, no page</li>
+    <li><strong>Informational</strong> — written to a <code>summary_index</code>, no notification, queryable for trends</li>
+  </ul>
+  <p>Suppression is as important as routing. During a known incident, a lookup-based suppression mechanism lets the on-call engineer suppress related alerts via a simple Splunk form — without modifying alert configurations. Suppression entries have a mandatory expiry time so nothing is suppressed indefinitely by accident.</p>
+
+  <h2>SmartStore: what I wish I had done from the start</h2>
+  <p>Splunk SmartStore decouples compute (indexers) from storage (S3-compatible object storage). Indexers keep only recent "hot" and "warm" buckets locally on fast SSD. Older "cold" data lives in object storage and is fetched on demand when searched. The cost reduction is dramatic — object storage is 10-20x cheaper per GB than SSD on indexer nodes.</p>
+  <p>We adopted SmartStore mid-project when storage costs became painful. Starting with it from the beginning would have meaningfully reduced infrastructure spend and made the indexer cluster easier to scale — you add compute without adding proportional storage.</p>
+<pre><code># indexes.conf with SmartStore
+[application_logs]
+remotePath = volume:s3_remote/$_index_name
+
+[volume:s3_remote]
+storageType = remote
+path = s3://your-bucket/splunk-cold
+remote.s3.endpoint = https://s3.eu-central-1.amazonaws.com</code></pre>
+
+  <h2>What I would do differently</h2>
+  <ul>
+    <li><strong>Automate every forwarder from day one.</strong> The forwarders we deployed manually before Ansible existed each had slight differences. Full automation from the start gives you a clean, auditable, reproducible baseline.</li>
+    <li><strong>Define a sourcetype taxonomy before ingesting anything.</strong> Naming grew organically and became inconsistent — three names for the same thing. A naming convention enforced from the first data source prevents years of cleanup work.</li>
+    <li><strong>Enable SmartStore from the start.</strong> The migration from local storage to SmartStore on a running cluster is possible but disruptive. Greenfield setup is much simpler.</li>
+    <li><strong>Treat structured logging as a platform requirement.</strong> Enforce JSON structured logs at the framework level rather than asking each team individually. The searches are dramatically easier, and the discipline pays compound dividends as you add more services.</li>
+  </ul>
+
+  <h2>The outcome</h2>
+  <p>Log search that previously took 30 minutes of SSH sessions across servers took 30 seconds in Splunk. Incident mean time to diagnose dropped measurably. Compliance teams got the audit trail they needed as a byproduct of how the platform operated, not as a separate reporting effort. And the operations team stopped flying blind.</p>
+  <p>Centralised logging is infrastructure that makes every other operation easier. If your team is still grepping individual servers, building a centralised logging platform is one of the highest-leverage investments in operational capability you can make.</p>
+
+</div>
+<div class="back-footer">
+  <a href="index.html#blog" class="btn-back">← Back to all posts</a>
+</div>
+</body>
+</html>

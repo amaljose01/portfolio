@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How I Run Large Cloud Operations Programmes — Amal Jose</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#f0f2f5; --bg-card:#ffffff; --accent:#0f766e; --accent2:#2563eb; --text:#111827; --muted:#4b5563; --border:rgba(0,0,0,0.1); --font-display:'Syne',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace; }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:16px; line-height:1.7; overflow-x:hidden; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 3rem; background:rgba(240,242,245,0.92); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:var(--font-mono); font-size:15px; color:var(--accent); text-decoration:none; letter-spacing:0.05em; }
+    .nav-back { color:var(--muted); text-decoration:none; font-size:14px; font-weight:500; transition:color 0.2s; }
+    .nav-back:hover { color:var(--text); }
+    .blog-hero { padding:7rem 2rem 3rem; max-width:800px; margin:0 auto; }
+    .blog-tag { font-family:var(--font-mono); font-size:12px; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:1rem; display:block; }
+    .blog-title { font-family:var(--font-display); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; line-height:1.1; letter-spacing:-0.02em; margin-bottom:1.5rem; }
+    .blog-meta { display:flex; gap:1.5rem; font-family:var(--font-mono); font-size:12px; color:var(--muted); padding-bottom:2rem; border-bottom:1px solid var(--border); margin-bottom:3rem; flex-wrap:wrap; }
+    .blog-body { max-width:800px; margin:0 auto; padding:0 2rem 5rem; }
+    .blog-body h2 { font-family:var(--font-display); font-size:1.5rem; font-weight:800; margin:3rem 0 1rem; color:var(--text); }
+    .blog-body h3 { font-size:1.1rem; font-weight:600; margin:2rem 0 0.75rem; color:var(--text); }
+    .blog-body p { color:var(--muted); margin-bottom:1.25rem; line-height:1.85; }
+    .blog-body p strong { color:var(--text); }
+    .blog-body ul, .blog-body ol { color:var(--muted); margin:0 0 1.25rem 1.5rem; }
+    .blog-body li { margin-bottom:0.6rem; line-height:1.8; }
+    .blog-body li strong { color:var(--text); }
+    pre { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin:1.5rem 0; overflow-x:auto; }
+    code { font-family:var(--font-mono); font-size:13px; color:var(--accent); line-height:1.7; }
+    p code, li code { background:var(--bg-card); padding:2px 7px; border-radius:4px; font-size:13px; color:var(--accent); }
+    .callout { background:var(--bg-card); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:1.25rem 1.5rem; margin:2rem 0; }
+    .callout p { margin:0; color:var(--text); }
+    .callout-warn { border-left-color:#f59e0b; }
+    hr { border:none; border-top:1px solid var(--border); margin:3rem 0; }
+    table { width:100%; border-collapse:collapse; margin:1.5rem 0; font-size:14px; }
+    th { background:var(--bg-card); color:var(--text); font-weight:600; padding:0.75rem 1rem; text-align:left; border-bottom:1px solid var(--border); }
+    td { padding:0.65rem 1rem; color:var(--muted); border-bottom:1px solid var(--border); }
+    td strong { color:var(--text); }
+    .back-footer { text-align:center; padding:3rem 2rem 4rem; border-top:1px solid var(--border); }
+    .btn-back { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); color:var(--text); padding:0.75rem 1.6rem; border-radius:6px; font-weight:500; font-size:14px; text-decoration:none; transition:border-color 0.2s; }
+    .btn-back:hover { border-color:var(--accent); background:rgba(15,118,110,0.06); }
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .blog-hero,.blog-body{padding-left:1.25rem;padding-right:1.25rem;} }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">amal.jose ~$</a>
+  <a href="index.html#blog" class="nav-back">← Back to blog</a>
+</nav>
+<div class="blog-hero">
+  <span class="blog-tag">Programme Management · Cloud Operations · Delivery</span>
+  <h1 class="blog-title">How I run large cloud operations programmes: planning, KPIs, and keeping 10 teams aligned</h1>
+  <div class="blog-meta">
+    <span>Amal Jose</span><span>2025</span><span>7 min read</span><span>Cloud Operations & Automation Engineer</span>
+  </div>
+</div>
+<div class="blog-body">
+
+  <p>Technical delivery at scale is as much a coordination problem as an engineering one. You can have the best automation pipelines in the world, but if ten teams across three time zones do not have a shared understanding of what is being delivered, when, and by whom — the engineering work will not land cleanly.</p>
+  <p>Over 11 years of cloud operations across large-scale SaaS platforms, I have developed a programme management approach that works for technical teams: rigorous enough to satisfy stakeholders and compliance requirements, lightweight enough that engineers do not feel buried in process. This post documents that approach.</p>
+
+  <h2>The programme manager's job in a cloud ops context</h2>
+  <p>In a traditional project management context, the PM coordinates handoffs between teams. In a cloud operations programme, the role is different. You are not managing a waterfall — you are managing a continuously operating system that also has to deliver new capabilities. The programme manager in this context owns three things:</p>
+  <ul>
+    <li><strong>Delivery visibility</strong> — at any point in time, what is the state of every workstream? What is blocked? What is at risk?</li>
+    <li><strong>Dependency management</strong> — across ten teams, which team is waiting on which other team, and is that wait about to become a blocker?</li>
+    <li><strong>Stakeholder communication</strong> — translating technical progress into business language for leadership, and business priorities into engineering decisions for teams.</li>
+  </ul>
+  <p>The programme manager does not make engineering decisions. They make sure the right people are making the right decisions at the right time, with the right information.</p>
+
+  <h2>Programme structure: the workstream model</h2>
+  <p>For large cloud operations programmes, I organise work into workstreams rather than a single flat backlog. Each workstream has:</p>
+  <ul>
+    <li>A single owning team and a named technical lead</li>
+    <li>A clearly scoped objective with a measurable outcome</li>
+    <li>A set of defined dependencies on other workstreams</li>
+    <li>Weekly status: Green / Amber / Red with a one-line rationale</li>
+  </ul>
+
+  <table>
+    <thead><tr><th>Workstream</th><th>Owner</th><th>Objective</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Tenant Migration</strong></td><td>Platform Ops</td><td>Migrate 200 tenants to new runtime by Q3</td><td style="color:#00e5a0">Green</td></tr>
+      <tr><td><strong>Observability</strong></td><td>SRE</td><td>Reduce MTTR from 45min to 15min via new alerting stack</td><td style="color:#f59e0b">Amber</td></tr>
+      <tr><td><strong>Security Hardening</strong></td><td>SecOps</td><td>Zero critical findings on Q3 pen test</td><td style="color:#00e5a0">Green</td></tr>
+      <tr><td><strong>Cost Optimisation</strong></td><td>FinOps + Infra</td><td>Reduce cloud spend 20% without SLA impact</td><td style="color:#ef4444">Red</td></tr>
+    </tbody>
+  </table>
+
+  <p>The RAG (Red/Amber/Green) status is not bureaucratic theatre. It is a communication tool. Red means: this needs a decision or resource that I as a programme manager cannot resolve — it needs leadership attention. Amber means: this is at risk and I am managing it, but you should know. Green means: no action needed from stakeholders.</p>
+
+  <h2>The weekly rhythm</h2>
+  <p>Large programmes fail when communication happens in bursts — a big kickoff, then silence, then a panic update when a deadline is missed. The cadence I maintain:</p>
+
+  <h3>Daily: async status update</h3>
+  <p>Each workstream lead posts a two-sentence Slack update to the programme channel: what moved forward yesterday, what is blocked today. Takes 2 minutes to write, takes 3 minutes for the programme manager to read across all workstreams. Blocking issues surface within 24 hours, not at the weekly meeting.</p>
+
+  <h3>Weekly: cross-team sync (45 minutes, structured)</h3>
+  <p>Not a status readout — the async updates handle that. The weekly sync is for three things only:</p>
+  <ol>
+    <li><strong>Dependency review</strong> — which teams need something from which other team in the next two weeks?</li>
+    <li><strong>Blocker resolution</strong> — items that are Amber or Red and need cross-team decision</li>
+    <li><strong>Upcoming milestones</strong> — what is going live in the next two weeks and what is the go-live checklist?</li>
+  </ol>
+  <p>Everything else stays in the workstream-level standups. The cross-team sync ends early if there is nothing to resolve. Engineers notice when you respect their time.</p>
+
+  <h3>Bi-weekly: executive update (one page)</h3>
+  <p>Leadership does not need technical details. They need to know: are we on track? What are the risks? What decisions do we need from them? The bi-weekly executive update is a single page with five sections: programme health (RAG), milestone summary, risks and mitigations, decisions needed, and a one-line outlook for the next two weeks.</p>
+
+  <div class="callout">
+    <p><strong>The rule of executive communication:</strong> If a leader has to ask a follow-up question to understand the status, the update failed. Write for the reader, not for yourself.</p>
+  </div>
+
+  <h2>KPIs that actually drive behaviour</h2>
+  <p>Most cloud operations programmes track output metrics — tickets closed, deployments completed, incidents resolved. These are trailing indicators. By the time they look bad, the programme is already off track. I track a mix of leading and lagging indicators:</p>
+
+  <h3>Leading indicators (predict future health)</h3>
+  <ul>
+    <li><strong>Dependency resolution rate</strong> — what percentage of cross-team dependencies are resolved before they become blockers? Below 80% is a warning sign.</li>
+    <li><strong>Estimation accuracy</strong> — how close are workstream estimates to actuals, week over week? Consistent underestimation means the team is under pressure and not surfacing risks early.</li>
+    <li><strong>Blocker age</strong> — how long does a Red item stay Red before it is resolved? Blockers older than 72 hours without a resolution path need escalation.</li>
+  </ul>
+
+  <h3>Lagging indicators (measure outcomes)</h3>
+  <ul>
+    <li><strong>Milestone delivery rate</strong> — percentage of milestones delivered on the committed date. Target is above 85%. Below 70% means planning is broken.</li>
+    <li><strong>Scope change rate</strong> — how often is scope added to in-flight workstreams? Frequent scope additions indicate requirements were not clear at kickoff.</li>
+    <li><strong>MTTR trend</strong> — for operational programmes, is mean time to resolve incidents trending down? This is the ultimate measure of whether the programme is delivering operational improvement.</li>
+  </ul>
+
+  <h2>Dependency management in practice</h2>
+  <p>Dependencies are where large programmes die. Team A is waiting for a config from Team B. Team B did not know Team A needed it until Team A mentioned it in the weekly sync — three weeks after Team B finished the relevant work and has since moved on. The knowledge is now buried in someone's head.</p>
+  <p>The dependency tracking model I use is simple: a shared table with four columns.</p>
+
+  <table>
+    <thead><tr><th>Dependency</th><th>Needs from</th><th>Needed by</th><th>Required by</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Network policy update for migration traffic</td><td>Networking team</td><td>Platform Ops</td><td>Week 6</td><td style="color:#f59e0b">In progress</td></tr>
+      <tr><td>Security review sign-off for new API surface</td><td>SecOps</td><td>Dev team</td><td>Week 5</td><td style="color:#00e5a0">Done</td></tr>
+      <tr><td>Quota increase approval</td><td>Cloud provider</td><td>Platform Ops</td><td>Week 7</td><td style="color:#ef4444">Blocked</td></tr>
+    </tbody>
+  </table>
+
+  <p>This table is reviewed in every weekly sync. Any dependency with a "Required by" date less than two weeks out that is not Done gets a named owner and a daily check-in until it is resolved.</p>
+
+  <h2>Go-live readiness: the checklist that travels</h2>
+  <p>Every major delivery milestone — a migration wave, a new service launch, a platform upgrade — goes through a go-live readiness checklist. Not as a bureaucratic gate, but as a structured way to surface the questions nobody thought to ask until 11pm the night before go-live.</p>
+  <p>The checklist covers:</p>
+  <ul>
+    <li><strong>Technical readiness</strong> — smoke tests passing, rollback procedure tested and documented, monitoring and alerting configured for the new surface</li>
+    <li><strong>Operational readiness</strong> — on-call engineer briefed, runbooks updated, support team notified of changes that affect their workflows</li>
+    <li><strong>Communication readiness</strong> — affected stakeholders notified, customer communication drafted (if applicable), change request approved</li>
+    <li><strong>Rollback criteria</strong> — explicit decision: under what conditions do we roll back, who makes that call, and how?</li>
+  </ul>
+  <p>The checklist is completed by the workstream lead, reviewed by the programme manager, and signed off by the engineering lead 48 hours before go-live. Any open items at 48 hours either get resolved or become explicit risks accepted by leadership.</p>
+
+  <h2>The thing they do not teach you</h2>
+  <p>Programme management literature is full of frameworks — PRINCE2, SAFe, OKRs. What it does not teach is the most important skill: knowing when to escalate and when to absorb.</p>
+  <p>Not every Amber item should go to leadership. Not every team delay is a programme risk. The programme manager's judgement — developed from understanding the technical context, the team dynamics, and the business stakes — is what determines which problems need senior attention and which ones need to be quietly resolved at the working level before they become noise.</p>
+  <p>That judgement is what separates a programme manager who adds value from one who adds meeting overhead. It is also what takes years to build. The frameworks are just scaffolding.</p>
+
+</div>
+<div class="back-footer">
+  <a href="index.html#blog" class="btn-back">← Back to all posts</a>
+</div>
+</body>
+</html>
